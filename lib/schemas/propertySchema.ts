@@ -20,6 +20,10 @@ legalFee: z.number().optional(),
 
   bathrooms: z.number().min(0),
 
+  parking: z.number().min(0),
+
+  payment_frequency: z.string(),
+
   description: z
     .string()
     .min(10, "Description must be at least 10 characters"),
