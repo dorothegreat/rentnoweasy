@@ -1,0 +1,47 @@
+import { z } from "zod";
+
+export const propertySchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+
+  propertyType: z.string().min(1, "Select property type"),
+
+  address: z.string().min(3, "Address is required"),
+
+  rentAmount: z
+  .number()
+  .min(1, "Rent amount must be greater than 0"),
+  serviceCharge: z.number().optional(),
+cautionFee: z.number().optional(),
+legalFee: z.number().optional(),
+
+  rentDuration: z.string().min(1, "Select rent duration"),
+
+  bedrooms: z.number().min(0),
+
+  bathrooms: z.number().min(0),
+
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters"),
+
+  images: z
+  .custom<FileList>()
+  .refine((files) => !files || files.length <= 10, "Maximum 10 images")
+  .refine(
+    (files) =>
+      !files ||
+      Array.from(files).every((file) => file.type.startsWith("image/")),
+    "Only image files allowed"
+  )
+  .optional(),
+
+  videoUrl: z.string().optional(),
+
+  fullName: z.string().min(2, "Full name is required"),
+
+  email: z.string().email("Invalid email address"),
+
+  phone: z.string().min(7, "Phone number is required"),
+});
+
+export type PropertyFormValues = z.infer<typeof propertySchema>;
