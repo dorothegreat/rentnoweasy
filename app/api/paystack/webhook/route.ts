@@ -56,7 +56,7 @@ export async function POST(req: Request) {
       max_unlocks: 5,
     });
   }
-
+    }
 }
 
   return NextResponse.json({ received: true });
