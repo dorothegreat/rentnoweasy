@@ -56,6 +56,8 @@ export default function HomePage() {
 
     if (!error && Array.isArray(data)) {
   setProperties(data);
+} else {
+  setProperties([]);
 }
   };
 
@@ -175,7 +177,7 @@ export default function HomePage() {
       className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow hover:shadow-xl transition">
       {/* Property Images */}
       <div className="relative p-2">
-        <PropertyImageSlider images={property.images || []} />
+        <PropertyImageSlider images={Array.isArray(property.images) ? property.images : []} />
 
         <div className="text-green-400 font-semibold">
           ₦{property.rent_amount?.toLocaleString()}
