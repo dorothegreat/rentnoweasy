@@ -3,9 +3,9 @@ import Image from "next/image";
 export default function Logo() {
   return (
     <Image
-      src="/logo.png"   // or logo.svg
+      src="/new-logo.png"   // or new-logo.svg
       alt="RentNowEasy Logo"
-      width={140}
+      width={80}
       height={40}
       priority
       className="object-contain"

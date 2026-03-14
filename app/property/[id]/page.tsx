@@ -2,81 +2,118 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import PropertyImageSlider from "@/components/PropertyImageSlider";
+import PageWrapper from "@/app/components/PageWrapper";
+import UnlockContactButton from "@/components/UnlockContactButton";
+
+interface Property {
+  id: string;
+  title: string;
+  location: string;
+  description: string;
+  images?: string[];
+  rent_amount: number;
+  landlord_phone?: string;
+}
 
 export default function PropertyPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id as string;
 
-  const [property, setProperty] = useState<any>(null);
-  const [subscribed, setSubscribed] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [property, setProperty] = useState<Property | null>(null);
+  const [phoneVisible, setPhoneVisible] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
-      // Load property
-      const { data: propertyData } = await supabase
+    const fetchProperty = async () => {
+      const { data, error } = await supabase
         .from("properties")
         .select("*")
         .eq("id", id)
         .single();
 
-      setProperty(propertyData);
-
-      // Get current user
-      const { data: userData } = await supabase.auth.getUser();
-
-      if (userData?.user) {
-        const { data: sub } = await supabase
-          .from("subscriptions")
-          .select("*")
-          .eq("user_id", userData.user.id)
-          .eq("active", true)
-          .single();
-
-        if (sub) setSubscribed(true);
+      if (!error && data) {
+        setProperty(data);
       }
-
-      setLoading(false);
     };
 
-    loadData();
+    if (id) {
+      fetchProperty();
+    }
   }, [id]);
 
-  if (loading) return <p className="p-10">Loading...</p>;
+  const unlockPhone = async () => {
+    const { data: userData } = await supabase.auth.getUser();
 
-  if (!property)
-    return <p className="p-10">Property not found</p>;
+    if (!userData.user) {
+      alert("Please login first");
+      return;
+    }
+
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", userData.user.id)
+      .single();
+
+    if (!subscription || subscription.unlocks_used >= 5) {
+      alert("You need an active subscription to unlock landlord contact.");
+      return;
+    }
+
+    await supabase
+      .from("subscriptions")
+      .update({
+        unlocks_used: subscription.unlocks_used + 1,
+      })
+      .eq("id", subscription.id);
+
+    setPhoneVisible(true);
+  };
+
+  if (!property) return <div className="p-10">Loading property...</div>;
 
   return (
-    <main className="p-10 space-y-4">
-      <h1 className="text-3xl font-bold">
-        {property.title}
-      </h1>
+    <PageWrapper>
+      <div className="max-w-5xl mx-auto px-6 py-12">
 
-      <p>📍 {property.location}</p>
-      <p>₦{property.price}</p>
+        <PropertyImageSlider images={property.images || []} />
 
-      <div className="border p-4 rounded">
-        {subscribed ? (
-          <p>
-            📞 Contact: {property.contact}
-          </p>
-        ) : (
-          <div className="space-y-2">
-            <p>
-              🔒 Subscribe to view landlord contact
-            </p>
+        <h1 className="text-3xl font-bold mt-6">
+          {property.title}
+        </h1>
 
-            <Link
-              href="/subscribe"
-              className="bg-blue-600 text-white px-4 py-2 rounded inline-block"
+        <p className="text-slate-400 mt-2">
+          {property.location}
+        </p>
+
+        <p className="text-xl font-semibold mt-4">
+          ₦{property.rent_amount?.toLocaleString() || "0"}
+        </p>
+
+        <p className="mt-6 text-slate-300">
+          {property.description}
+        </p>
+
+        {/* Contact Section */}
+        <div className="mt-8 p-6 bg-slate-800 border border-slate-700 rounded-xl">
+
+          {!phoneVisible ? (
+            <button
+              onClick={unlockPhone}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg"
             >
-              Subscribe Now
-            </Link>
-          </div>
-        )}
+              Unlock Landlord Contact
+            </button>
+          ) : (
+            <p className="text-lg font-semibold">
+              📞 {property.landlord_phone}
+            </p>
+          )}
+
+        </div>
+
       </div>
-    </main>
+    </PageWrapper>
   );
 }

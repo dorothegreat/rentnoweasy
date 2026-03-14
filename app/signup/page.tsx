@@ -21,7 +21,6 @@ export default function SignupPage() {
     setLoading(true)
     setError("")
 
-    // 1️⃣ Create Auth User
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -33,18 +32,17 @@ export default function SignupPage() {
       return
     }
 
-    // 2️⃣ Insert into profiles table
     if (data.user) {
       const { error: profileError } = await supabase
-  .from("profiles")
-  .insert([
-    {
-      id: data.user.id,
-      full_name: fullName,
-      email: email,
-      role: role,
-    },
-  ])
+        .from("profiles")
+        .insert([
+          {
+            id: data.user.id,
+            full_name: fullName,
+            email: email,
+            role: role,
+          },
+        ])
 
       if (profileError) {
         setError(profileError.message)
@@ -54,18 +52,18 @@ export default function SignupPage() {
     }
 
     if (role === "landlord") {
-  router.push("dashboard")
-} else {
-  router.push("dashboard")
-}
+      router.push("dashboard")
+    } else {
+      router.push("dashboard")
+    }
   }
 
   return (
     <PageWrapper>
-      <main className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg">
+      <main className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="bg-slate-800 border border-slate-700 w-full max-w-md p-8 rounded-2xl shadow-lg">
 
-          <h2 className="text-2xl font-bold mb-6 text-center">
+          <h2 className="text-2xl font-bold mb-6 text-center text-slate-100">
             Create Account
           </h2>
 
@@ -83,7 +81,7 @@ export default function SignupPage() {
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full px-4 py-3 border rounded-xl"
+              className="w-full px-4 py-3 bg-slate-800 border border-slate-600 text-white rounded-xl"
             />
 
             <input
@@ -92,7 +90,7 @@ export default function SignupPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border rounded-xl"
+              className="w-full px-4 py-3 bg-slate-800 border border-slate-600 text-white rounded-xl"
             />
 
             <input
@@ -101,30 +99,32 @@ export default function SignupPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border rounded-xl"
+              className="w-full px-4 py-3 bg-slate-800 border border-slate-600 text-white rounded-xl"
             />
+
             <select
-  value={role}
-  onChange={(e) => setRole(e.target.value)}
-  className="w-full px-4 py-3 border rounded-xl"
->
-  <option value="tenant">Tenant</option>
-  <option value="landlord">Landlord</option>
-</select>
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-800 border border-slate-600 text-white rounded-xl"
+            >
+              <option value="tenant">Tenant</option>
+              <option value="landlord">Landlord</option>
+            </select>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-3 rounded-xl
-                         hover:bg-indigo-700 active:scale-95 transition
+              className="w-full bg-blue-600 text-white py-3 rounded-xl
+                         hover:bg-blue-700 active:scale-95 transition
                          disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Creating..." : "Create Account"}
             </button>
           </form>
 
-          <p className="text-sm text-center mt-6">
+          <p className="text-sm text-center mt-6 text-slate-400">
             Already have an account?{" "}
-            <Link href="/login" className="text-indigo-600 font-semibold">
+            <Link href="/login" className="text-blue-500 font-semibold">
               Login
             </Link>
           </p>

@@ -1,9 +1,37 @@
 ﻿"use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import PageWrapper from "../components/PageWrapper";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Login clicked"); // debug test
+
+    setError("");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    router.push("/dashboard");
+  };
+
   return (
     <PageWrapper>
       <main className="min-h-screen flex">
@@ -21,34 +49,51 @@ export default function LoginPage() {
         </div>
 
         {/* Right Panel */}
-        <div className="w-full md:w-1/2 flex items-center justify-center bg-gray-50 px-6">
-          <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg">
+        <div className="w-full md:w-1/2 flex items-center justify-center bg-slate-900 px-6">
+          <div className="bg-slate-800 border border-slate-700 w-full max-w-md p-8 rounded-2xl shadow-lg">
 
-            <h2 className="text-2xl font-bold mb-6 text-center">
+            <h2 className="text-2xl font-bold mb-6 text-center text-slate-100">
               Login to Your Account
             </h2>
 
-            <div className="space-y-4">
+            {error && (
+              <p className="text-red-500 text-sm text-center mb-4">
+                {error}
+              </p>
+            )}
+
+            {/* FORM ADDED */}
+            <form onSubmit={handleLogin}>
+
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-600 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
 
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-800 border border-slate-600 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
 
-              <button className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition">
-                Login
-              </button>
-            </div>
+              <button
+  onClick={() => console.log("Button clicked")}
+  className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition"
+>
+  Login
+</button>
 
-            <p className="text-sm text-center mt-6">
+
+            </form>
+
+            <p className="text-sm text-center mt-6 text-slate-400">
               Don’t have an account?{" "}
-              <Link href="/signup" className="text-blue-600 font-semibold">
+              <Link href="/signup" className="text-blue-500 font-semibold">
                 Sign up
               </Link>
             </p>
@@ -60,3 +105,4 @@ export default function LoginPage() {
     </PageWrapper>
   );
 }
+

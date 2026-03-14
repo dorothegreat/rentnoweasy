@@ -1,4 +1,4 @@
-﻿"use client"
+﻿"use client";
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -8,7 +8,7 @@ import Link from "next/link"
 export default function DashboardPage() {
   const router = useRouter()
 
-  const [role, setRole] = useState<string | null>(null)
+  const [role, setRole] = useState<string>("tenant")
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function DashboardPage() {
 
       if (error) {
         console.error(error.message)
-      } else {
+      } else if (data) {
         setRole(data.role)
       }
 
@@ -52,7 +52,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-slate-900 text-slate-100 p-8">
       <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
 
       {role === "landlord" && <LandlordUI />}
@@ -73,12 +73,12 @@ function LandlordUI() {
       <div className="flex gap-4">
         <Link
           href="/add-listing"
-          className="bg-black text-white px-4 py-2 rounded hover:opacity-80 inline-block"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block"
         >
           Add Property
         </Link>
 
-        <button className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+        <button className="bg-slate-800 border border-slate-700 text-slate-200 px-4 py-2 rounded hover:bg-slate-700">
           View My Listings
         </button>
       </div>
@@ -96,11 +96,14 @@ function TenantUI() {
       <h2 className="text-xl font-semibold">Tenant Panel</h2>
 
       <div className="flex gap-4">
-        <button className="bg-black text-white px-4 py-2 rounded hover:opacity-80">
+        <Link
+          href="/"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block"
+        >
           Browse Properties
-        </button>
+        </Link>
 
-        <button className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">
           Saved Listings
         </button>
       </div>

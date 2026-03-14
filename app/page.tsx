@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import PageWrapper from "./components/PageWrapper";
+import PropertyImageSlider from "@/components/PropertyImageSlider";
+import Link from "next/link";
 
 interface Property {
   id: string;
@@ -71,7 +73,7 @@ export default function HomePage() {
   {/* Background Image */}
   <div className="absolute inset-0">
     <img
-      src="/hero-house.jpg"
+      src="/new-hero-house.png"
       alt="Rental homes"
       className="w-full h-full object-cover"
     />
@@ -91,7 +93,7 @@ export default function HomePage() {
     </p>
 
     {/* Search Bar */}
-    <div className="mt-8 bg-white/95 backdrop-blur-md rounded-xl shadow-lg p-4 max-w-5xl mx-auto">
+    <div className="mt-8 bg-slate-800/95 border border-slate-700 backdrop-blur-md rounded-xl shadow-lg p-4 max-w-5xl mx-auto">
 
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
 
@@ -101,15 +103,14 @@ export default function HomePage() {
       placeholder="Location"
       value={locationSearch}
       onChange={(e) => setLocationSearch(e.target.value)}
-      className="px-4 py-3 text-black rounded-lg border focus:outline-none"
-    />
+      className="px-4 py-3 bg-slate-800 border border-slate-600 text-slate-100 rounded-lg focus:outline-none"
+      />
 
     {/* Property Type */}
     <select
       value={typeSearch}
       onChange={(e) => setTypeSearch(e.target.value)}
-      className="px-4 py-3 text-black rounded-lg border"
-    >
+      className="px-4 py-3 bg-slate-800 border border-slate-600 text-slate-100 rounded-lg">
       <option value="">Type</option>
       <option value="apartment">Apartment</option>
       <option value="duplex">Duplex</option>
@@ -125,7 +126,7 @@ export default function HomePage() {
       placeholder="Min Price"
       value={minPrice}
       onChange={(e) => setMinPrice(e.target.value)}
-      className="px-4 py-3 text-black rounded-lg border"
+      className="px-4 py-3 bg-slate-800 border border-slate-600 text-slate-100 rounded-lg focus:outline-none"
     />
 
     {/* Max Price */}
@@ -134,14 +135,14 @@ export default function HomePage() {
       placeholder="Max Price"
       value={maxPrice}
       onChange={(e) => setMaxPrice(e.target.value)}
-      className="px-4 py-3 text-black rounded-lg border"
+      className="px-4 py-3 bg-slate-800 border border-slate-600 text-slate-100 rounded-lg focus:outline-none"
     />
 
     {/* Bedrooms */}
     <select
       value={bedroomFilter}
       onChange={(e) => setBedroomFilter(e.target.value)}
-      className="px-4 py-3 text-black rounded-lg border"
+      className="px-4 py-3 bg-slate-800 border border-slate-600 text-slate-100 rounded-lg focus:outline-none"
     >
       <option value="">Bedrooms</option>
       <option value="1">1</option>
@@ -153,8 +154,7 @@ export default function HomePage() {
     {/* Search Button */}
     <button
       onClick={fetchProperties}
-      className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-    >
+      className="bg-blue-600 hover:bg-blue-700 text-white">
       Search
     </button>
 
@@ -169,52 +169,40 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {properties.map((property) => (
-              <motion.div
-                key={property.id}
-                whileHover={{ scale: 1.03 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
-              >
-                {/* Property Images */}
-<div className="relative p-2">
-  <div className="grid grid-cols-3 gap-2">
-    {property.images?.map((img, index) => (
-      <img
-        key={index}
-        src={img}
-        className="w-full h-24 object-cover rounded"
-      />
-    ))}
-  </div>
+  <Link href={`/property/${property.id}`} key={property.id}>
+    <motion.div
+      whileHover={{ scale: 1.03 }}
+      className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow hover:shadow-xl transition">
+      {/* Property Images */}
+      <div className="relative p-2">
+        <PropertyImageSlider images={property.images || []} />
 
-  {/* Rent badge */}
-  <div className="absolute top-3 left-3 bg-white px-3 py-1 rounded-full text-sm font-semibold shadow">
-    ₦{property.rent_amount?.toLocaleString()}
-  </div>
-</div>
+        <div className="text-green-400 font-semibold">
+          ₦{property.rent_amount?.toLocaleString()}
+        </div>
+      </div>
 
-                {/* Property Info */}
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">
-                    {property.title}
-                  </h3>
+      {/* Property Info */}
+      <div className="p-6">
+        <h3 className="text-xl font-semibold mb-2">
+          {property.title}
+        </h3>
 
-                  <p className="text-gray-600 dark:text-gray-300 mb-3">
-                    {property.location}
-                  </p>
+        <p className="text-slate-400 mb-3">
+          {property.location}
+        </p>
 
-                  {/* Cost Breakdown */}
-                  <p className="text-sm text-gray-500">
-                    Agent Fee (10%): ₦
-                    {property.agent_fee?.toLocaleString()}
-                  </p>
+        <p className="text-slate-400 mb-3">
+          Agent Fee (10%): ₦{property.agent_fee?.toLocaleString()}
+        </p>
 
-                  <p className="font-semibold text-green-600">
-                    Total Package: ₦
-                    {property.total_package?.toLocaleString()}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+        <p className="font-semibold text-green-400">
+          Total Package: ₦{property.total_package?.toLocaleString()}
+        </p>
+      </div>
+    </motion.div>
+  </Link>
+))}
           </div>
         </section>
       </main>
