@@ -33,7 +33,7 @@ export default function UnlockContactButton({ propertyId, phone }: Props) {
     const data = await res.json();
 
     window.location.href = data.data.authorization_url;
-  };
+  }
 
   const unlock = async () => {
     setLoading(true);
