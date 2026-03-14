@@ -91,37 +91,38 @@ const totalPackage =
   (data.legalFee || 0) +
   agentFee;
 
-    let imageUrl = null;
+    let imageUrls: string[] = [];
 
-    // ✅ Upload images first
-    const formData = new FormData();
+if (formData.images && formData.images.length > 0) {
+  for (const image of formData.images) {
+    const fileExt = image.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
 
-  Object.entries(data).forEach(([key, value]) => {
-    if (key !== "images") {   // ✅ changed from "image"
-      formData.append(key, value as any);
+    const { error: uploadError } = await supabase.storage
+      .from("property-images")
+      .upload(fileName, image);
+
+    if (uploadError) {
+      alert("Image upload failed");
+      return;
     }
-  });
 
-  // ✅ handle multiple images
-  if (data.images && data.images.length > 0) {
-    Array.from(data.images as FileList).forEach((file: File) => {
-  formData.append("images", file);
-});
+    const { data } = supabase.storage
+      .from("property-images")
+      .getPublicUrl(fileName);
+
+    imageUrls.push(data.publicUrl);
   }
+}
 
     // ✅ Send data to backend WITH images
-    const res = await fetch("/api/properties", {
-  method: "POST",
-  body: formData,
+    await supabase.from("properties").insert({
+  title,
+  location,
+  price,
+  image_urls: imageUrls,
+  user_id: user.id
 });
-
-router.push("/");
-
-    const result = await res.json();
-
-    if (!res.ok) {
-      throw new Error(result.error || "Failed to save property");
-    }
 
     alert("Property submitted successfully!");
   } catch (error: any) {

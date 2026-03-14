@@ -28,16 +28,7 @@ legalFee: z.number().optional(),
     .string()
     .min(10, "Description must be at least 10 characters"),
 
-  images: z
-  .custom<FileList>()
-  .refine((files) => !files || files.length <= 10, "Maximum 10 images")
-  .refine(
-    (files) =>
-      !files ||
-      Array.from(files).every((file) => file.type.startsWith("image/")),
-    "Only image files allowed"
-  )
-  .optional(),
+  images: z.array(z.any()).optional(),
 
   videoUrl: z.string().optional(),
 
