@@ -54,9 +54,9 @@ export default function HomePage() {
 
     const { data, error } = await query;
 
-    if (!error && data) {
-      setProperties(data);
-    }
+    if (!error && Array.isArray(data)) {
+  setProperties(data);
+}
   };
 
   // load properties initially
@@ -168,7 +168,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold mb-10">Featured Listings</h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map((property) => (
+            {Array.isArray(properties) && properties.map((property) => (
   <Link href={`/property/${property.id}`} key={property.id}>
     <motion.div
       whileHover={{ scale: 1.03 }}
