@@ -18,6 +18,17 @@ export default function PropertyCard({ property }: any) {
               No Image
             </div>
           )}
+          {property.status === "rented" && (
+  <span className="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full">
+    Rented
+  </span>
+)}
+
+{property.status !== "rented" && (
+  <span className="absolute top-3 left-3 bg-green-500 text-white text-xs px-3 py-1 rounded-full">
+    Available
+  </span>
+)}
         </div>
 
         {/* Content */}

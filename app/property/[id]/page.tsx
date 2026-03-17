@@ -15,14 +15,15 @@ interface Property {
   images?: string[];
   rent_amount: number;
   landlord_phone?: string;
+  status?: string;
 }
+
 
 export default function PropertyPage() {
   const params = useParams();
   const id = params.id as string;
 
   const [property, setProperty] = useState<Property | null>(null);
-  const [phoneVisible, setPhoneVisible] = useState(false);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -42,36 +43,22 @@ export default function PropertyPage() {
     }
   }, [id]);
 
-  const unlockPhone = async () => {
-    const { data: userData } = await supabase.auth.getUser();
-
-    if (!userData.user) {
-      alert("Please login first");
-      return;
-    }
-
-    const { data: subscription } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", userData.user.id)
-      .single();
-
-    if (!subscription || subscription.unlocks_used >= 5) {
-      alert("You need an active subscription to unlock landlord contact.");
-      return;
-    }
-
-    await supabase
-      .from("subscriptions")
-      .update({
-        unlocks_used: subscription.unlocks_used + 1,
-      })
-      .eq("id", subscription.id);
-
-    setPhoneVisible(true);
-  };
-
   if (!property) return <div className="p-10">Loading property...</div>;
+
+  /* -----------------------------------------
+Structured Data (SEO rich results)
+----------------------------------------- */
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Apartment",
+    name: property.title,
+    description: property.description,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: property.location,
+    },
+  };
 
   return (
     <PageWrapper>
@@ -96,22 +83,24 @@ export default function PropertyPage() {
         </p>
 
         {/* Contact Section */}
+
         <div className="mt-8 p-6 bg-slate-800 border border-slate-700 rounded-xl">
 
-          {!phoneVisible ? (
-            <button
-              onClick={unlockPhone}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg"
-            >
-              Unlock Landlord Contact
-            </button>
-          ) : (
-            <p className="text-lg font-semibold">
-              📞 {property.landlord_phone}
-            </p>
-          )}
+          <UnlockContactButton
+            propertyId={property.id}
+            landlordPhone={property.landlord_phone}
+          />
 
         </div>
+
+        {/* SEO Structured Data */}
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
 
       </div>
     </PageWrapper>

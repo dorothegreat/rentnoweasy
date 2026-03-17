@@ -43,11 +43,12 @@ export async function POST(req: Request) {
         .maybeSingle();
 
       if (!existing) {
-        await supabase.from("subscriptions").insert({
-          user_id: profile.id,
-          status: "active",
-          max_unlocks: 5,
-        });
+        await supabase
+  .from("subscriptions")
+  .upsert({
+    user_id: profile.id,
+    unlocks_remaining: 5,
+  });
       }
     }
   }
